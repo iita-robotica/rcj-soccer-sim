@@ -15,6 +15,7 @@ from referee.event_handlers import DrawMessageHandler, JSONLoggerHandler
 from referee.referee import RCJSoccerReferee
 from referee.supervisor import RCJSoccerSupervisor
 
+from gira_soccer_referee import GIRASoccerReferee
 
 def get_video_recorder_class(rec_format: str) -> BaseVideoRecordAssistant:
     return {
@@ -75,7 +76,7 @@ output_prefix = output_path(
 reflog_path = output_prefix.with_suffix(".jsonl")
 
 supervisor = RCJSoccerSupervisor()
-referee = RCJSoccerReferee(
+referee = GIRASoccerReferee(
     supervisor=supervisor,
     match_time=MATCH_TIME,
     progress_check_steps=ceil(15 / (TIME_STEP / 1000.0)),

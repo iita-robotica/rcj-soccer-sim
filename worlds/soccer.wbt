@@ -2007,4 +2007,5 @@ Robot {
   controller "rcj_soccer_referee_supervisor"
   supervisor TRUE
   synchronization TRUE
+  window "rcj_soccer_referee_supervisor_window"
 }
