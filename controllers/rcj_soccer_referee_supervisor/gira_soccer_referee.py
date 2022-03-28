@@ -5,8 +5,14 @@ import time
 import random
 import math
 
-from watchdog.observers import Observer
-from watchdog.events import PatternMatchingEventHandler
+watchdog_installed = False
+try:
+    from watchdog.observers import Observer
+    from watchdog.events import PatternMatchingEventHandler
+    watchdog_installed = True
+except:
+    print("Watchdog module not installed, automatic controller reload disabled. To enable, run 'pip install watchdog'")
+
 from referee.referee import RCJSoccerReferee
 from referee.consts import (BALL_DEPTH,
                             FIELD_X_UPPER_LIMIT, FIELD_X_LOWER_LIMIT,
@@ -63,6 +69,8 @@ class GIRASoccerReferee(RCJSoccerReferee):
             self.check_goal_flag = True
 
     def start_watchdog(self):
+        if not watchdog_installed: return
+
         def on_any_event(_):
             self.reset_controllers_flag = True
 
@@ -77,6 +85,7 @@ class GIRASoccerReferee(RCJSoccerReferee):
         self.observer.start()
 
     def stop_watchdog(self):
+        if not watchdog_installed: return
         self.observer.stop()
 
     def send(self, __key, **args):
