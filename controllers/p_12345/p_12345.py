@@ -53,17 +53,37 @@ right_motor.setPosition(float('+inf'))
 left_motor.setVelocity(0.0)
 right_motor.setVelocity(0.0)
 
-def add_supervisor_data(packet, direction, strength, data):
+def receive_latest_data(receiver):
+    packet = None
+    direction = None
+    strength = None
+    counter = 0
+    while receiver.getQueueLength() > 0:
+        counter = counter + 1
+        packet = receiver.getData()
+        direction = receiver.getEmitterDirection()
+        strength = receiver.getSignalStrength()
+        receiver.nextPacket()
+    if counter > 1:
+        print(robot.getName(), "-", receiver.getName(), "- Packets lost:", counter - 1)
+    return (packet, direction, strength)
+
+def add_supervisor_data(data):
+    packet, _, _ = receive_latest_data(receiver)
+    if packet is None: return
     struct_fmt = "?"
     unpacked = struct.unpack(struct_fmt, packet)
     data["waiting_for_kickoff"] = unpacked[0]
 
-def add_team_data(packet, direction, strength, data):
+def add_team_data(data):
+    packet, _, _ = receive_latest_data(team_receiver)
+    if packet is None: return
     struct_fmt = "i"
     unpacked = struct.unpack(struct_fmt, packet)
     data["robot_id"] = unpacked[0]
 
-def add_ball_data(packet, direction, strength, data):
+def add_ball_data(data):
+    _, direction, strength = receive_latest_data(ball_receiver)
     ball_data = {}
     ball_data["direction"] = direction
     ball_data["strength"] = strength
@@ -79,6 +99,7 @@ def send_data_to_team(robot_id) -> None:
     data = [robot_id]
     packet = struct.pack(struct_fmt, *data)
     team_emitter.send(packet)
+
 
 def get_gps_coordinates() -> list:
     """Get new GPS coordinates
@@ -119,41 +140,17 @@ def get_sonar_values() -> dict:
 
 def add_robot_data(data):
     robot_data = {}
+    robot_data["name"] = robot_name
     robot_data["position"] = get_gps_coordinates()
     robot_data["rotation"] = get_compass_heading()
     robot_data["sonar"] = get_sonar_values()
-    data[robot_name] = robot_data
-
-def add_latest_data(receiver, parse, data):
-    packet = None
-    direction = None
-    strength = None
-    counter = 0
-    while receiver.getQueueLength() > 0:
-        counter = counter + 1
-        packet = receiver.getData()
-        direction = receiver.getEmitterDirection()
-        strength = receiver.getSignalStrength()
-        receiver.nextPacket()
-    if counter > 0:
-        parse(packet, direction, strength, data)
-        if counter > 1:
-            print(robot.getName(), ".", parse.__name__ ,"- Packets lost:", counter - 1)
-
-def merge(*maps):
-    result = {}
-    for m in maps:
-        if m is None: continue
-        for k,v in m.items():
-            result[k] = v
-    return result
+    data["robot"] = robot_data
 
 def collect_data():
     data = {}
-    add_latest_data(receiver, add_supervisor_data, data)
-    add_latest_data(team_receiver, add_team_data, data)
-    add_latest_data(ball_receiver, add_ball_data, data)
-    #add_ball_data(data)
+    add_supervisor_data(data)
+    add_team_data(data)
+    add_ball_data(data)
     add_robot_data(data)
 
     data["color"] = robot_color
@@ -171,7 +168,7 @@ while robot.step(TIME_STEP) != -1:
         client_sock.sendto(data, (UDP_IP, UDP_PORT))
 
         data, addr = client_sock.recvfrom(1024)
-        print(f"received message: {data} from {addr}")
+        #print(f"received message: {data} from {addr}")
         data = json.loads(data)
         left_motor.setVelocity(data[robot.getName()]["L"])
         right_motor.setVelocity(data[robot.getName()]["R"])
