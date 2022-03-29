@@ -75,31 +75,12 @@ def add_supervisor_data(data):
     unpacked = struct.unpack(struct_fmt, packet)
     data["waiting_for_kickoff"] = unpacked[0]
 
-def add_team_data(data):
-    packet, _, _ = receive_latest_data(team_receiver)
-    if packet is None: return
-    struct_fmt = "i"
-    unpacked = struct.unpack(struct_fmt, packet)
-    data["robot_id"] = unpacked[0]
-
 def add_ball_data(data):
     _, direction, strength = receive_latest_data(ball_receiver)
     ball_data = {}
     ball_data["direction"] = direction
     ball_data["strength"] = strength
     data["ball"] = ball_data
-
-def send_data_to_team(robot_id) -> None:
-    """Send data to the team
-
-    Args:
-            robot_id (int): ID of the robot
-    """
-    struct_fmt = "i"
-    data = [robot_id]
-    packet = struct.pack(struct_fmt, *data)
-    team_emitter.send(packet)
-
 
 def get_gps_coordinates() -> list:
     """Get new GPS coordinates
@@ -149,7 +130,6 @@ def add_robot_data(data):
 def collect_data():
     data = {}
     add_supervisor_data(data)
-    add_team_data(data)
     add_ball_data(data)
     add_robot_data(data)
 
@@ -163,8 +143,7 @@ while robot.step(TIME_STEP) != -1:
         begin_time = time.time()
         data = collect_data()
 
-        data = json.dumps(data)
-        data = data.encode("utf8")
+        data = json.dumps(data).encode("utf8")
         client_sock.sendto(data, (UDP_IP, UDP_PORT))
 
         data, addr = client_sock.recvfrom(1024)
