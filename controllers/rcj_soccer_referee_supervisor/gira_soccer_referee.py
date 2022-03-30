@@ -254,7 +254,7 @@ class GIRASoccerReferee(RCJSoccerReferee):
             robot.resetPhysics()
 
             # Rotation
-            rotation = [0, 1, 0, math.radians(90 * (1 if yellow else -1))]
+            rotation = [0, 0, 1, math.radians(90 * (1 if yellow else -1))]
             robot.getField("rotation").setSFRotation(rotation)
             self.sv.robot_rotation[robot_name] = rotation
 

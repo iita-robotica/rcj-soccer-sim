@@ -160,7 +160,7 @@ let dispatchTable = {
 			let rot = data["robot_rotation"][robot_name];
 			update("#" + robot_name + "-x", fmt(pos[1]));
 			update("#" + robot_name + "-y", fmt(pos[0]));
-			update("#" + robot_name + "-a", fmt(degrees(rot[3])) + "deg");
+			update("#" + robot_name + "-a", fmt(degrees(rot[2]*rot[3])) + "deg");
 			$("#" + robot_name + "-display").css("color", (data["selected"] == robot_name ? "red" : "black"));
 		})
 	}
