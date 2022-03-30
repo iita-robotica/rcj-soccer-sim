@@ -98,11 +98,7 @@ def get_compass_heading() -> float:
         float: Compass value in radians
     """
     compass_values = compass.getValues()
-
-    # Add math.pi/2 (90) so that the heading 0 is facing opponent's goal
-    rad = math.atan2(compass_values[0], compass_values[1]) + (math.pi / 2)
-    if rad < -math.pi:
-        rad = rad + (2 * math.pi)
+    rad = math.atan2(compass_values[0], compass_values[1])
 
     return rad
 
