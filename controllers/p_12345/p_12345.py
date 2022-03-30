@@ -77,6 +77,7 @@ def add_supervisor_data(data):
 
 def add_ball_data(data):
     _, direction, strength = receive_latest_data(ball_receiver)
+    if direction is None or strength is None: return
     ball_data = {}
     ball_data["direction"] = direction
     ball_data["strength"] = strength
