@@ -68,12 +68,33 @@ def receive_latest_data(receiver):
         print(robot.getName(), "-", receiver.getName(), "- Packets lost:", counter - 1)
     return (packet, direction, strength)
 
+def receive_all_data(receiver):
+    data = []
+    while receiver.getQueueLength() > 0:
+        packet = receiver.getData()
+        direction = receiver.getEmitterDirection()
+        strength = receiver.getSignalStrength()
+        data.append((packet, direction, strength))
+        receiver.nextPacket()
+    if len(data) == 0: return None
+    return data
+
 def add_supervisor_data(data):
     packet, _, _ = receive_latest_data(receiver)
     if packet is None: return
     struct_fmt = "?"
     unpacked = struct.unpack(struct_fmt, packet)
     data["waiting_for_kickoff"] = unpacked[0]
+
+def add_team_data(data):
+    in_data = receive_all_data(team_receiver)
+    if in_data is None: return
+    data["team"] = [json.loads(packet.decode("utf8")) for packet, _, _ in in_data]
+    
+def send_team_data(data):
+    if data is None: return
+    packet = json.dumps(data).encode("utf8")
+    team_emitter.send(packet)
 
 def add_ball_data(data):
     _, direction, strength = receive_latest_data(ball_receiver)
@@ -129,31 +150,35 @@ def collect_data():
     add_supervisor_data(data)
     add_ball_data(data)
     add_robot_data(data)
+    add_team_data(data)
 
     data["color"] = robot_color
     data["time"] = robot.getTime()
     return data
 
-
 while robot.step(TIME_STEP) != -1:
     try:
         begin_time = time.time()
-        data = collect_data()
 
+        data = collect_data()
         data = json.dumps(data).encode("utf8")
         client_sock.sendto(data, (UDP_IP, UDP_PORT))
 
         data, addr = client_sock.recvfrom(1024)
         #print(f"received message: {data} from {addr}")
         data = json.loads(data)
+
+        for msg in data.get("team", []):
+            send_team_data(msg)
+
         left_motor.setVelocity(data[robot.getName()]["L"])
         right_motor.setVelocity(data[robot.getName()]["R"])
+
         end_time = time.time()
         diff_time = round((end_time - begin_time)*1000)
         if diff_time > TIME_STEP:
             print(robot.getName(), "- Delay:" , str(diff_time) , "ms")
     except Exception as e:
         print(e)
-
 
 client_sock.close()
