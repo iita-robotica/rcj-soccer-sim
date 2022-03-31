@@ -1,3 +1,5 @@
+
+import math
 def get_direction(ball_vector: list) -> int:
     """Get direction to navigate robot to face the ball
 
@@ -31,4 +33,6 @@ class World:
         return self.ball
 
 
+def angleBetweenPoints(x1, y1, x2, y2):
+    return math.atan2(y2 - y1, x2 - x1)
     

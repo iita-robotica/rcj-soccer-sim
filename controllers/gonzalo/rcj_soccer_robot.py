@@ -1,6 +1,6 @@
 import math
 import struct
-from utils import World
+from utils import World, angleBetweenPoints
 from angles import r2d, d2r, normalize
 
 TIME_STEP = 64
@@ -50,6 +50,7 @@ class RCJSoccerRobot:
         self.right_motor.setVelocity(0.0)
         
         self.world=World()
+        self.MAX_VEL=10
 
     def parse_supervisor_msg(self, packet: str) -> dict:
         """Parse message received from supervisor
@@ -100,6 +101,8 @@ class RCJSoccerRobot:
             "x": unpacked[1],
             "y": unpacked[2],
             "rotation": unpacked[3],
+            "ballX": unpacked[4],
+            "ballY": unpacked[5]
         }
         return data
 
@@ -127,10 +130,9 @@ class RCJSoccerRobot:
         Args:
              robot_id (int): ID of the robot
         """
-        struct_fmt = "i f f f"
+        struct_fmt = "i f f f f f"
  
-        data = [self.player_id, self.get_gps_coordinates()[0], self.get_gps_coordinates()[1], self.get_compass_heading()]#, self.world.getBall()[0], self.world.getBall()[1]]
-        print(self.world.getBall())
+        data = [self.player_id, self.get_gps_coordinates()[0], self.get_gps_coordinates()[1], self.get_compass_heading(), self.world.getBall()["x"], self.world.getBall()["y"]]
         packet = struct.pack(struct_fmt, *data)
         self.team_emitter.send(packet)
 
@@ -221,12 +223,7 @@ class RCJSoccerRobot:
 
     def goToBall(self):
         """Go to ball"""
-        if self.world.ball is None:
-            # If the robot does not see the ball, stop motors
-            self.left_motor.setVelocity(0)
-            self.right_motor.setVelocity(0)
-            return False
-
+        #ACAACA Rehacer
         # Compute the speed for motors
         direction = self.world.ball["direction"]
 
@@ -243,25 +240,47 @@ class RCJSoccerRobot:
         self.left_motor.setVelocity(left_speed)
         self.right_motor.setVelocity(right_speed)
         return True
-    
+
+    def lookAtAPoint(self, x, y, thresh=5):
+        deg=r2d(angleBetweenPoints(x,y,self.get_gps_coordinates()[0], self.get_gps_coordinates()[1])+math.pi/2)
+        deg=normalize(deg, -180, 180)
+        rot=r2d(self.get_compass_heading())
+        final=deg-rot
+        print("Calculo ori:", final)
+        if final>90 or final<-90:    
+            dir=-1
+        else:
+            dir=1
+        print("Calculo dir:", dir)
+        if final>90:
+            final=final-180
+        if final<-90:
+            final=final+180
+        
+        print("Calculo final:", final)
+        dir=1
+        vel=abs(final/9)
+        if abs(final)<=thresh:
+            vl=0
+            vr=0
+        else:
+            if final>0:
+                vl=-vel*dir
+                vr=vel*dir
+            else:
+                vl=vel*dir
+                vr=-vel*dir
+        
+        self.setVelocity(vl, vr)
+        
+        
     def goToPoint(self, x, y):
         """Go to point x y"""
-        # Compute the speed for motors
-        direction = utils.get_direction(ball_data["direction"])
-
-        # If the robot has the ball right in front of it, go forward,
-        # rotate otherwise
-        if direction == 0:
-            left_speed = 5
-            right_speed = 5
-        else:
-            left_speed = direction * 4
-            right_speed = direction * -4
-
-        # Set the speed to motors
-        self.left_motor.setVelocity(left_speed)
-        self.right_motor.setVelocity(right_speed)
-        return True
+        deltaX=x-self.get_gps_coordinates()[0]
+        deltaY=y-self.get_gps_coordinates()[1]
+        radian=math.atan2(deltaY, deltaX)+math.pi/2
+        print(r2d(radian))
+    
     
     def stop(self):
         self.left_motor.setVelocity(0)
@@ -277,7 +296,11 @@ class RCJSoccerRobot:
 
         while self.is_new_team_data():
             team_data = self.get_new_team_data()
-            self.world.setRobot(team_data["robot_id"], team_data["x"], team_data["y"], team_data["rotation"]) 
+            self.world.setRobot(team_data["robot_id"], team_data["x"], team_data["y"], team_data["rotation"])
+            # print(team_data)
+            if team_data["ballX"] != -100:
+                print(team_data["ball_x"], team_data["ball_y"])
+                self.world.setBall(team_data["ball_x"], team_data["ball_y"])
         
 
         self.world.setRobot(self.player_id, self.get_gps_coordinates()[0], self.get_gps_coordinates()[1], self.get_compass_heading())  
@@ -286,7 +309,7 @@ class RCJSoccerRobot:
             ball_data = self.get_new_ball_data()
             self.world.setBall(ball_data["x"], ball_data["y"])
         else:
-            self.world.setBall(None, None)
+            self.world.setBall(-100, -100)
             
     def run(self):
         raise NotImplementedError
