@@ -151,15 +151,15 @@ let dispatchTable = {
 
 		$("#time-display").text(data["time"].toFixed(3) + "s");
 
-		update("#ball-x", fmt(data["ball_translation"][1]));
-		update("#ball-y", fmt(data["ball_translation"][0]));
+		update("#ball-x", fmt(data["ball_translation"][0]));
+		update("#ball-y", fmt(data["ball_translation"][1]));
 		$("#ball-display").css("color", (data["selected"] == "BALL" ? "red" : "black"));
 
 		Object.keys(data["robot_translation"]).forEach(robot_name => {
 			let pos = data["robot_translation"][robot_name];
 			let rot = data["robot_rotation"][robot_name];
-			update("#" + robot_name + "-x", fmt(pos[1]));
-			update("#" + robot_name + "-y", fmt(pos[0]));
+			update("#" + robot_name + "-x", fmt(pos[0]));
+			update("#" + robot_name + "-y", fmt(pos[1]));
 			update("#" + robot_name + "-a", fmt(degrees(rot[2]*rot[3])) + "deg");
 			$("#" + robot_name + "-display").css("color", (data["selected"] == robot_name ? "red" : "black"));
 		})
