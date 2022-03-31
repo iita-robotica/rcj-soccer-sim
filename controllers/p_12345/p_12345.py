@@ -168,7 +168,7 @@ while robot.step(TIME_STEP) != -1:
         #print(f"received message: {data} from {addr}")
         data = json.loads(data)
 
-        for msg in data.get("team", []):
+        for msg in data.get("team") or []:
             send_team_data(msg)
 
         left_motor.setVelocity(data[robot.getName()]["L"])
