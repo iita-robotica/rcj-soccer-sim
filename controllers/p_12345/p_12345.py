@@ -1,6 +1,5 @@
 from controller import Robot
 import struct
-from typing import Tuple
 import socket
 import json
 import time
@@ -171,13 +170,13 @@ while robot.step(TIME_STEP) != -1:
         for msg in data.get("team") or []:
             send_team_data(msg)
 
-        left_motor.setVelocity(data[robot.getName()]["L"])
-        right_motor.setVelocity(data[robot.getName()]["R"])
+        left_motor.setVelocity(data[robot_name]["L"])
+        right_motor.setVelocity(data[robot_name]["R"])
 
         end_time = time.time()
         diff_time = round((end_time - begin_time)*1000)
         if diff_time > TIME_STEP:
-            print(robot.getName(), "- Delay:" , str(diff_time) , "ms")
+            print(robot_name, "- Delay:" , str(diff_time) , "ms")
     except Exception as e:
         print(e)
 
