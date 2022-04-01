@@ -15,10 +15,12 @@ class MyRobot2(RCJSoccerRobot):
             # El mundo sabe si está esperando kick, posición de cada robot del equipo y posición de la pelota
             self.refreshWorld()
             sonar_values = self.get_sonar_values() 
-            # self.goToBall()
-            # print(self.world.robots[2])
-
+            # if self.world.getBall()["x"] != -100:
+                # self.goToBall()
+            # self.goToPoint(0,0)
+            self.lookAtAPoint(self.world.getBall()["x"], self.world.getBall()["y"])
+            # self.setVelocity(100, 100) 
             # Send message to team robots
             self.send_data_to_team()
-            self.stop()
+            # self.stop()
             # self.setVelocity(-1,1)
