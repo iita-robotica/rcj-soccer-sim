@@ -109,7 +109,7 @@ def get_gps_coordinates() -> list:
 
 def get_compass_values() -> float:
     compass_values = compass.getValues()
-    return [compass_values[0], compass_values[0]]
+    return [compass_values[0], compass_values[1]]
 
 def get_sonar_values() -> dict:
     return {
