@@ -104,31 +104,14 @@ def add_ball_data(data):
     data["ball"] = ball_data
 
 def get_gps_coordinates() -> list:
-    """Get new GPS coordinates
-
-    Returns:
-        List containing x and y values
-    """
     gps_values = gps.getValues()
     return [gps_values[0], gps_values[1]]
 
-def get_compass_heading() -> float:
-    """Get compass heading in radians
-
-    Returns:
-        float: Compass value in radians
-    """
+def get_compass_values() -> float:
     compass_values = compass.getValues()
-    rad = math.atan2(compass_values[0], compass_values[1])
-
-    return rad
+    return [compass_values[0], compass_values[0]]
 
 def get_sonar_values() -> dict:
-    """Get new values from sonars.
-
-    Returns:
-        dict: Value for each sonar.
-    """
     return {
         "left": sonar_left.getValue(),
         "right": sonar_right.getValue(),
@@ -139,8 +122,8 @@ def get_sonar_values() -> dict:
 def add_robot_data(data):
     robot_data = {}
     robot_data["name"] = robot_name
-    robot_data["position"] = get_gps_coordinates()
-    robot_data["rotation"] = get_compass_heading()
+    robot_data["gps"] = get_gps_coordinates()
+    robot_data["compass"] = get_compass_values()
     robot_data["sonar"] = get_sonar_values()
     data["robot"] = robot_data
 
