@@ -17,6 +17,7 @@ N_ROBOTS = len(ROBOT_NAMES)
 robot = Robot()
 robot_name = robot.getName()
 robot_color = robot_name[0] # B/Y
+robot_idx = int(robot_name[1]) - 1
 
 receiver = robot.getDevice("supervisor receiver")
 receiver.enable(TIME_STEP)
@@ -122,6 +123,8 @@ def get_sonar_values() -> dict:
 def add_robot_data(data):
     robot_data = {}
     robot_data["name"] = robot_name
+    robot_data["color"] = robot_color
+    robot_data["index"] = robot_idx
     robot_data["gps"] = get_gps_coordinates()
     robot_data["compass"] = get_compass_values()
     robot_data["sonar"] = get_sonar_values()
@@ -129,13 +132,11 @@ def add_robot_data(data):
 
 def collect_data():
     data = {}
+    data["time"] = robot.getTime()
     add_supervisor_data(data)
     add_ball_data(data)
     add_robot_data(data)
     add_team_data(data)
-
-    data["color"] = robot_color
-    data["time"] = robot.getTime()
     return data
 
 while robot.step(TIME_STEP) != -1:
@@ -153,8 +154,8 @@ while robot.step(TIME_STEP) != -1:
         for msg in data.get("team") or []:
             send_team_data(msg)
 
-        left_motor.setVelocity(data[robot_name]["L"])
-        right_motor.setVelocity(data[robot_name]["R"])
+        left_motor.setVelocity(data["L"])
+        right_motor.setVelocity(data["R"])
 
         end_time = time.time()
         diff_time = round((end_time - begin_time)*1000)
