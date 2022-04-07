@@ -6,7 +6,7 @@ from angles import r2d, d2r, normalize
 TIME_STEP = 64
 ROBOT_NAMES = ["B1", "B2", "B3", "Y1", "Y2", "Y3"]
 N_ROBOTS = len(ROBOT_NAMES)
-
+ball_ant= [0,0]
 
 class RCJSoccerRobot:
     def __init__(self, robot):
@@ -246,18 +246,12 @@ class RCJSoccerRobot:
         deg=normalize(deg, -180, 180)
         rot=r2d(self.get_compass_heading())
         final=deg-rot
-        print("Calculo ori:", final)
-        if final>90 or final<-90:    
-            dir=-1
-        else:
-            dir=1
-        print("Calculo dir:", dir)
+        # print("Calculo ori:", final)
         if final>90:
             final=final-180
         if final<-90:
             final=final+180
         
-        print("Calculo final:", final)
         dir=1
         vel=abs(final/9)
         if abs(final)<=thresh:
@@ -274,12 +268,35 @@ class RCJSoccerRobot:
         self.setVelocity(vl, vr)
         
         
-    def goToPoint(self, x, y):
+    def goToPoint(self, x, y, thresh):
         """Go to point x y"""
-        deltaX=x-self.get_gps_coordinates()[0]
-        deltaY=y-self.get_gps_coordinates()[1]
-        radian=math.atan2(deltaY, deltaX)+math.pi/2
-        print(r2d(radian))
+        deg=r2d(angleBetweenPoints(x,y,self.get_gps_coordinates()[0], self.get_gps_coordinates()[1])+math.pi/2)
+        deg=normalize(deg, -180, 180)
+        rot=r2d(self.get_compass_heading())
+        final=deg-rot
+        
+        dist=math.sqrt((x-self.get_gps_coordinates()[0])**2+(y-self.get_gps_coordinates()[1])**2)
+
+        if final>90:
+            final=final-180
+        if final<-90:
+            final=final+180
+
+        dir=1
+        dif=abs(final/9)*0.5+(1/dist)*0.5
+        if abs(final*dist)<=thresh:
+            vl=self.MAX_VEL
+            vr=self.MAX_VEL
+        else:
+            if final>0:
+                vr=self.MAX_VEL
+                vl=self.MAX_VEL-dif
+                
+            else:
+                vl=self.MAX_VEL
+                vr=self.MAX_VEL-dif
+        
+        self.setVelocity(vl, vr)
     
     
     def stop(self):
