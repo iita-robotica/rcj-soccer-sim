@@ -234,9 +234,9 @@ class GIRASoccerReferee(RCJSoccerReferee):
             field = object.getField("translation")
             field_value = field.getSFVec3f()
             if property_name == "x":
-                field_value[1] = property_value
-            elif property_name == "y":
                 field_value[0] = property_value
+            elif property_name == "y":
+                field_value[1] = property_value
             field.setSFVec3f(field_value)
             if object_def == "BALL":
                 self.ball_translation = field_value

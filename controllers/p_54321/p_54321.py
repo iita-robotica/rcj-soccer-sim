@@ -6,7 +6,7 @@ import time
 import math
 
 UDP_IP = "127.0.0.1"
-UDP_PORT = 12345
+UDP_PORT = 54321
 client_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 client_sock.settimeout(0.1)
 
