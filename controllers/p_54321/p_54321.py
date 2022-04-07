@@ -10,7 +10,7 @@ UDP_PORT = 54321
 client_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 client_sock.settimeout(0.1)
 
-TIME_STEP = 64
+TIME_STEP = 32
 ROBOT_NAMES = ["B1", "B2", "B3", "Y1", "Y2", "Y3"]
 N_ROBOTS = len(ROBOT_NAMES)
 
