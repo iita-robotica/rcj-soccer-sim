@@ -27,4 +27,5 @@ class MyRobot2(RCJSoccerRobot):
             # Send message to team robots
             self.send_data_to_team()
             # self.stop()
-            # self.setVelocity(-1,1)
+            self.setVelocity(-1,1)
+            

@@ -21,10 +21,10 @@ class World:
         self.ballAnt={"x":0, "y":0}
 
     def setRobot(self, id, x, y, rot):
-        self.robots[id]={"x":x, "y":y, "rot":rot}
+        self.robots[id-1]={"x":x, "y":y, "rot":rot}
     
     def getRobot(self, id):
-        return self.robots[id]
+        return self.robots[id-1]
     
     def setBall(self, x, y):
         self.ball={"x":x, "y":y}
