@@ -18,9 +18,14 @@ class MyRobot2(RCJSoccerRobot):
             # if self.world.getBall()["x"] != -100:
                 # self.goToBall()
             # self.goToPoint(0,0)
-            self.lookAtAPoint(self.world.getBall()["x"], self.world.getBall()["y"])
+            if(self.world.getBall()["x"] != -100):
+                # self.lookAtAPoint(self.world.getBall()["x"], self.world.getBall()["y"])
+                self.goToPoint(self.world.getBall()["x"], self.world.getBall()["y"],2)
+            else:
+                self.setVelocity(-self.MAX_VEL/4,self.MAX_VEL/4)
             # self.setVelocity(100, 100) 
             # Send message to team robots
             self.send_data_to_team()
             # self.stop()
-            # self.setVelocity(-1,1)
+            self.setVelocity(-1,1)
+            

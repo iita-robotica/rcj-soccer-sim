@@ -1,4 +1,3 @@
-
 import math
 def get_direction(ball_vector: list) -> int:
     """Get direction to navigate robot to face the ball
@@ -19,12 +18,13 @@ class World:
         self.wfk=False
         self.robots=[{"x":0, "y":0, "rot":0}, {"x":0, "y":0, "rot":0}, {"x":0, "y":0, "rot":0}]
         self.ball={"x":0, "y":0}
+        self.ballAnt={"x":0, "y":0}
 
     def setRobot(self, id, x, y, rot):
-        self.robots[id]={"x":x, "y":y, "rot":rot}
+        self.robots[id-1]={"x":x, "y":y, "rot":rot}
     
     def getRobot(self, id):
-        return self.robots[id]
+        return self.robots[id-1]
     
     def setBall(self, x, y):
         self.ball={"x":x, "y":y}
