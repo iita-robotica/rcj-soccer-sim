@@ -17,6 +17,7 @@ from referee.referee import RCJSoccerReferee
 from referee.consts import (BALL_DEPTH,
                             FIELD_X_UPPER_LIMIT, FIELD_X_LOWER_LIMIT,
                             FIELD_Y_UPPER_LIMIT, FIELD_Y_LOWER_LIMIT)
+from referee.utils import (time_to_string)
 
 STATE_FILE = "state.json"
 CONTROLLERS_DIR = ".."
@@ -25,6 +26,8 @@ SUPERVISOR_NAME = os.path.split(os.getcwd())[1]
 class GIRASoccerReferee(RCJSoccerReferee):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        self.pending_messages = []
 
         self.reset_controllers_flag = False
         self.reset_controllers_last_time = time.time()
@@ -120,6 +123,7 @@ class GIRASoccerReferee(RCJSoccerReferee):
         self.sendCurrentState()
 
         return_value = super().tick()
+        
         if self.check_timer_flag:
             return return_value
         else:
@@ -132,7 +136,18 @@ class GIRASoccerReferee(RCJSoccerReferee):
                 selected=selected.getDef() if selected is not None else None,
                 ball_translation=self.sv.ball_translation,
                 robot_translation=self.sv.robot_translation,
-                robot_rotation=self.sv.robot_rotation)
+                robot_rotation=self.sv.robot_rotation,
+                goal=self.ball_reset_timer > 0,
+                messages=self.pending_messages)
+        self.pending_messages = []
+
+    def add_event_message_to_queue(self, message: str):
+        if self.time >= 0:
+            msg_string = f"{time_to_string(self.time)} - {message}"
+        else:
+            msg_string = f"0:00 - {message}"
+        self.pending_messages.append(msg_string)
+        return super().add_event_message_to_queue(message)
 
     def checkWatchdog(self):
         if self.reset_controllers_flag:
@@ -291,3 +306,4 @@ class GIRASoccerReferee(RCJSoccerReferee):
                 check_progress=self.check_progress_flag,
                 check_robots_in_penalty_area=self.check_robots_in_penalty_area_flag,
                 check_goal=self.check_goal_flag)
+

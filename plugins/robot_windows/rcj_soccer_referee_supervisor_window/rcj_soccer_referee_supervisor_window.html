@@ -13,65 +13,73 @@
     <link type="text/css" rel="stylesheet" href="rcj_soccer_referee_supervisor_window.css">
   </head>
   <body>
-    <div class="container pt-2">
-      <div class="form-group">
-        <label for="yellow-team-controller">Yellow team</label>
-        <select class="form-control" id="yellow-team-controller"></select>
+    <div id="main-container" class="container pt-2 fullscreen">
+      <div id="controls">
+        <div class="form-group">
+          <label for="yellow-team-controller">Yellow team</label>
+          <select class="form-control" id="yellow-team-controller"></select>
+        </div>
+        <div class="form-group">
+          <label for="blue-team-controller">Blue team</label>
+          <select class="form-control" id="blue-team-controller"></select>
+        </div>
+
+        <hr>
+
+        <div class="custom-control custom-checkbox">
+          <input type="checkbox" class="custom-control-input" id="check_timer">
+          <label class="custom-control-label" for="check_timer">Check timer</label>
+        </div>
+        <div class="custom-control custom-checkbox">
+          <input type="checkbox" class="custom-control-input" id="check_progress">
+          <label class="custom-control-label" for="check_progress">Check progress</label>
+        </div>
+        <div class="custom-control custom-checkbox">
+          <input type="checkbox" class="custom-control-input" id="check_goal">
+          <label class="custom-control-label" for="check_goal">Check goal</label>
+        </div>
+        <div class="custom-control custom-checkbox">
+          <input type="checkbox" class="custom-control-input" id="check_robots_in_penalty_area">
+          <label class="custom-control-label" for="check_robots_in_penalty_area">Check robots in penalty area</label>
+        </div>
+
+        <hr>
+
+        <button id="start-button" type="button" class="btn btn-primary btn-lg btn-block" >
+          <i class="fas fa-sync-alt mr-2"></i>
+          <span>Reset controllers</span>
+        </button>
+
+        <hr>
+
+        <button id="save-state-button" type="button" class="btn btn-primary btn-lg btn-block">
+          <i class="fas fa-download mr-2"></i>
+          <span>Save positions</span>
+        </button>
+        <button id="restore-state-button" type="button" class="btn btn-primary btn-lg btn-block">
+          <i class="fas fa-upload mr-2"></i>
+          <span>Restore positions</span>
+        </button>
+
+        <hr>
+
+        <button id="randomize-ball-button" type="button" class="btn btn-primary btn-lg btn-block">
+          <i class="fas fa-futbol mr-2"></i>
+          <span>Randomize ball position</span>
+        </button>
+        <button id="move-out-button" type="button" class="btn btn-primary btn-lg btn-block">
+          <i class="fas fa-arrows-alt mr-2"></i>
+          <span>Move robots out of the field</span>
+        </button>
+
+        <hr>
       </div>
-      <div class="form-group">
-        <label for="blue-team-controller">Blue team</label>
-        <select class="form-control" id="blue-team-controller"></select>
+
+      <div id="messages" class="bg-light overflow-auto border">
       </div>
 
       <hr>
-
-      <div class="custom-control custom-checkbox">
-        <input type="checkbox" class="custom-control-input" id="check_timer">
-        <label class="custom-control-label" for="check_timer">Check timer</label>
-      </div>
-      <div class="custom-control custom-checkbox">
-        <input type="checkbox" class="custom-control-input" id="check_progress">
-        <label class="custom-control-label" for="check_progress">Check progress</label>
-      </div>
-      <div class="custom-control custom-checkbox">
-        <input type="checkbox" class="custom-control-input" id="check_goal">
-        <label class="custom-control-label" for="check_goal">Check goal</label>
-      </div>
-      <div class="custom-control custom-checkbox">
-        <input type="checkbox" class="custom-control-input" id="check_robots_in_penalty_area">
-        <label class="custom-control-label" for="check_robots_in_penalty_area">Check robots in penalty area</label>
-      </div>
-
-      <hr>
-
-      <button id="start-button" type="button" class="btn btn-primary btn-lg btn-block" >
-        <i class="fas fa-sync-alt mr-2"></i>
-        <span>Reset controllers</span>
-      </button>
-
-      <hr>
-
-      <button id="save-state-button" type="button" class="btn btn-primary btn-lg btn-block">
-        <i class="fas fa-download mr-2"></i>
-        <span>Save positions</span>
-      </button>
-      <button id="restore-state-button" type="button" class="btn btn-primary btn-lg btn-block">
-        <i class="fas fa-upload mr-2"></i>
-        <span>Restore positions</span>
-      </button>
-
-      <hr>
-
-      <button id="randomize-ball-button" type="button" class="btn btn-primary btn-lg btn-block">
-        <i class="fas fa-futbol mr-2"></i>
-        <span>Randomize ball position</span>
-      </button>
-      <button id="move-out-button" type="button" class="btn btn-primary btn-lg btn-block">
-        <i class="fas fa-arrows-alt mr-2"></i>
-        <span>Move robots out of the field</span>
-      </button>
-
-      <div class="fixed-bottom text-monospace">
+      <div id="table-display" class="fixed-bottom text-monospace">
         <div class="col">
           <div class="row">
             <div class="col-2 text-left">Time:</div>
@@ -123,6 +131,10 @@
           </div>
         </div>
       </div>
+    </div>
+    <div id="goal-panel" class="overlay" style="display:none;">
+      <div class="overlay" style="background-color: black; opacity: 0.75;"></div>
+      <h1 class="text-light text-center position-absolute" style="position: absolute; width: 100%; top: 40%; font-size: 64px;">GOAL!</h1>
     </div>
 
     <!-- JQuery/Popper/Bootstrap -->

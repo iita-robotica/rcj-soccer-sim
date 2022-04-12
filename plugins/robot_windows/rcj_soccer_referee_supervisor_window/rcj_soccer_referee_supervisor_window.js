@@ -137,6 +137,28 @@ let dispatchTable = {
 		$("#check_robots_in_penalty_area").get(0).checked = data["check_robots_in_penalty_area"];
 	},
 	update: function (data) {
+		function resizeMessages() {
+			let container = document.getElementById("main-container");
+			let controls = document.getElementById("controls");
+			let table = document.getElementById("table-display");
+			let messages = document.getElementById("messages");
+			
+			var h = (container.clientHeight - controls.clientHeight - table.clientHeight) * 0.7;
+			if (h < 0) { h = 0; }
+
+			messages.style.height = "" + h + "px";
+		}
+		resizeMessages();
+		//$("#messages").html("");
+		if (data["messages"].length > 0) {
+			data["messages"].forEach(msg => {
+				$("#messages").append($("<div>").text(msg));
+			});
+			// Scroll to bottom
+			let panel = $("#messages").get(0);
+			panel.scrollTop = panel.scrollHeight - panel.clientHeight;
+		}
+
 		let fmt = (val) => val.toFixed(3);
 		let degrees = (radians) => radians * (180/Math.PI);
 		let update = (selector, text) => {
@@ -162,7 +184,13 @@ let dispatchTable = {
 			update("#" + robot_name + "-y", fmt(pos[1]));
 			update("#" + robot_name + "-a", fmt(degrees(rot[2]*rot[3])) + "deg");
 			$("#" + robot_name + "-display").css("color", (data["selected"] == robot_name ? "red" : "black"));
-		})
+		});
+
+		if(data["goal"]) {
+			$("#goal-panel").show();
+		} else {
+			$("#goal-panel").hide();
+		}
 	}
 };
 
