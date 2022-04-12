@@ -44,6 +44,7 @@ $("#move-out-button").on("click", function () {
 	send("move_out");
 });
 
+let snapshot = null;
 let editing = null;
 ["ball-x", "ball-y",
 "Y1-x", "Y1-y", "Y1-a",
@@ -100,8 +101,28 @@ window.onload = function() {
 		};
 	}
 
+	window.addEventListener("resize", resizeMessages);
+	resizeMessages();
+	startStepping();
 	send("setup");
 };
+
+function resizeMessages() {
+	let container = document.getElementById("main-container");
+	let controls = document.getElementById("controls");
+	let table = document.getElementById("table-display");
+	let messages = document.getElementById("messages");
+	
+	var h = (container.clientHeight - controls.clientHeight - table.clientHeight) * 0.7;
+	if (h < 0) { h = 0; }
+
+	messages.style.height = "" + h + "px";
+}
+
+
+function startStepping() {
+	setInterval(update, 128);
+  }
 
 function delay(ms) {
 	return new Promise(resolve => {
@@ -137,62 +158,61 @@ let dispatchTable = {
 		$("#check_robots_in_penalty_area").get(0).checked = data["check_robots_in_penalty_area"];
 	},
 	update: function (data) {
-		function resizeMessages() {
-			let container = document.getElementById("main-container");
-			let controls = document.getElementById("controls");
-			let table = document.getElementById("table-display");
-			let messages = document.getElementById("messages");
-			
-			var h = (container.clientHeight - controls.clientHeight - table.clientHeight) * 0.7;
-			if (h < 0) { h = 0; }
-
-			messages.style.height = "" + h + "px";
+		if (snapshot) { // Preserve pending messages
+			data.messages = snapshot.messages.concat(data.messages);
 		}
-		resizeMessages();
-		//$("#messages").html("");
-		if (data["messages"].length > 0) {
-			data["messages"].forEach(msg => {
-				$("#messages").append($("<div>").text(msg));
-			});
-			// Scroll to bottom
-			let panel = $("#messages").get(0);
-			panel.scrollTop = panel.scrollHeight - panel.clientHeight;
-		}
-
-		let fmt = (val) => val.toFixed(3);
-		let degrees = (radians) => radians * (180/Math.PI);
-		let update = (selector, text) => {
-			let $el = $(selector);
-			if ($el.get(0) == editing) {
-				$el.css("color", "blue");
-			} else {
-				$el.css("color", "inherit");
-				$el.text(text);
-			}
-		}
-
-		$("#time-display").text(data["time"].toFixed(3) + "s");
-
-		update("#ball-x", fmt(data["ball_translation"][0]));
-		update("#ball-y", fmt(data["ball_translation"][1]));
-		$("#ball-display").css("color", (data["selected"] == "BALL" ? "red" : "black"));
-
-		Object.keys(data["robot_translation"]).forEach(robot_name => {
-			let pos = data["robot_translation"][robot_name];
-			let rot = data["robot_rotation"][robot_name];
-			update("#" + robot_name + "-x", fmt(pos[0]));
-			update("#" + robot_name + "-y", fmt(pos[1]));
-			update("#" + robot_name + "-a", fmt(degrees(rot[2]*rot[3])) + "deg");
-			$("#" + robot_name + "-display").css("color", (data["selected"] == robot_name ? "red" : "black"));
-		});
-
-		if(data["goal"]) {
-			$("#goal-panel").show();
-		} else {
-			$("#goal-panel").hide();
-		}
+		snapshot = data;
 	}
 };
+
+function update () {
+	if (!snapshot) return;
+	let data = snapshot;
+	
+	if (data["messages"].length > 0) {
+		while (data["messages"].length > 0) {
+			let msg = data["messages"].shift();
+			$("#messages").append($("<div>").text(msg));			
+		}
+
+		// Scroll to bottom
+		let panel = $("#messages").get(0);
+		panel.scrollTop = panel.scrollHeight - panel.clientHeight;
+	}
+
+	let fmt = (val) => val.toFixed(3);
+	let degrees = (radians) => radians * (180/Math.PI);
+	let update = (selector, text) => {
+		let $el = $(selector);
+		if ($el.get(0) == editing) {
+			$el.css("color", "blue");
+		} else {
+			$el.css("color", "inherit");
+			$el.text(text);
+		}
+	}
+
+	$("#time-display").text(data["time"].toFixed(3) + "s");
+
+	update("#ball-x", fmt(data["ball_translation"][0]));
+	update("#ball-y", fmt(data["ball_translation"][1]));
+	$("#ball-display").css("color", (data["selected"] == "BALL" ? "red" : "black"));
+
+	Object.keys(data["robot_translation"]).forEach(robot_name => {
+		let pos = data["robot_translation"][robot_name];
+		let rot = data["robot_rotation"][robot_name];
+		update("#" + robot_name + "-x", fmt(pos[0]));
+		update("#" + robot_name + "-y", fmt(pos[1]));
+		update("#" + robot_name + "-a", fmt(degrees(rot[2]*rot[3])) + "deg");
+		$("#" + robot_name + "-display").css("color", (data["selected"] == robot_name ? "red" : "black"));
+	});
+
+	if(data["goal"]) {
+		$("#goal-panel").show();
+	} else {
+		$("#goal-panel").hide();
+	}
+}
 
 function receive (msg, args) {
 	let fn = dispatchTable[msg];
