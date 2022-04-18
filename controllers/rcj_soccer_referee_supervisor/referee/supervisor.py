@@ -30,6 +30,7 @@ class RCJSoccerSupervisor(Supervisor):
         self.robot_rotation_fields = {}
         self.robot_translation = {}
         self.robot_rotation = {}
+        self.robot_reset_physics = {}
         for robot in ROBOT_NAMES:
             robot_node = self.getFromDef(robot)
             self.robot_nodes[robot] = robot_node
@@ -41,6 +42,8 @@ class RCJSoccerSupervisor(Supervisor):
             field = robot_node.getField("rotation")
             self.robot_rotation_fields[robot] = field
             self.robot_rotation[robot] = field.getSFRotation()
+
+            self.robot_reset_physics[robot] = 0
 
     def update_positions(self):
         """Update the positions of robots and the ball"""
@@ -83,6 +86,7 @@ class RCJSoccerSupervisor(Supervisor):
         """
         tr_field = self.robot_translation_fields[robot_name]
         tr_field.setSFVec3f(position)
+        self.robot_reset_physics[robot_name] = 1
         self.robot_nodes[robot_name].resetPhysics()
         self.robot_translation[robot_name] = position
 

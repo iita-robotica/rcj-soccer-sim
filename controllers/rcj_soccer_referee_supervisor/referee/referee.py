@@ -377,6 +377,14 @@ class RCJSoccerReferee:
         )
 
     def tick(self) -> bool:
+        # HACK(Richo): Workaround for the following issue 
+        # https://github.com/RoboCupJuniorTC/rcj-soccer-sim/issues/130
+        for robot in ROBOT_NAMES:
+            reset_physics_counter = self.sv.robot_reset_physics[robot]
+            if reset_physics_counter > 0:
+                self.sv.robot_nodes[robot].resetPhysics()
+                self.sv.robot_reset_physics[robot] = reset_physics_counter - 1
+
         # On the very first tick, note that the match has started
         if self.time == self.match_time:
             self.eventer.event(
