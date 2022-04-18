@@ -160,6 +160,6 @@ while robot.step(TIME_STEP) != -1:
         if diff_time > TIME_STEP:
             print(robot_name, "- Delay:" , str(diff_time) , "ms")
     except Exception as e:
-        print(e)
+        print(robot_name, "-", e)
 
 client_sock.close()
