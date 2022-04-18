@@ -2008,4 +2008,5 @@ Robot {
   supervisor TRUE
   synchronization TRUE
   window "rcj_soccer_referee_supervisor_window"
+  showWindow TRUE
 }
