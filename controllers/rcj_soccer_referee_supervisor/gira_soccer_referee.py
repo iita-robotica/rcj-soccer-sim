@@ -10,9 +10,12 @@ watchdog_installed = False
 try:
     from watchdog.events import PatternMatchingEventHandler
     from watchdog.observers import Observer
+
     watchdog_installed = True
 except:
-    print("Watchdog module not installed, automatic controller reload disabled. To enable, run 'pip install watchdog'")
+    print(
+        "Watchdog module not installed, automatic controller reload disabled. To enable, run 'pip install watchdog'"
+    )
 
 from referee.consts import (
     BALL_DEPTH,
@@ -28,6 +31,7 @@ STATE_FILE = "state.json"
 CONTROLLERS_DIR = ".."
 SUPERVISOR_NAME = os.path.split(os.getcwd())[1]
 
+
 class GIRASoccerReferee(RCJSoccerReferee):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -42,13 +46,15 @@ class GIRASoccerReferee(RCJSoccerReferee):
 
     def saveState(self):
         try:
-            data = {"Y": self.get_current_controller("Y"),
-                    "B": self.get_current_controller("B"),
-                    "saved_snapshot": self.saved_snapshot,
-                    "check_timer_flag": self.check_timer_flag,
-                    "check_progress_flag": self.check_progress_flag,
-                    "check_goal_flag": self.check_goal_flag,
-                    "check_robots_in_penalty_area_flag": self.check_robots_in_penalty_area_flag}
+            data = {
+                "Y": self.get_current_controller("Y"),
+                "B": self.get_current_controller("B"),
+                "saved_snapshot": self.saved_snapshot,
+                "check_timer_flag": self.check_timer_flag,
+                "check_progress_flag": self.check_progress_flag,
+                "check_goal_flag": self.check_goal_flag,
+                "check_robots_in_penalty_area_flag": self.check_robots_in_penalty_area_flag,
+            }
             with open(STATE_FILE, "w") as file:
                 json.dump(data, file)
         except:
@@ -62,7 +68,9 @@ class GIRASoccerReferee(RCJSoccerReferee):
             self.saved_snapshot = data.get("saved_snapshot", None)
             self.check_timer_flag = data.get("check_timer_flag", True)
             self.check_progress_flag = data.get("check_progress_flag", True)
-            self.check_robots_in_penalty_area_flag = data.get("check_robots_in_penalty_area_flag", True)
+            self.check_robots_in_penalty_area_flag = data.get(
+                "check_robots_in_penalty_area_flag", True
+            )
             self.check_goal_flag = data.get("check_goal_flag", True)
             if "Y" in data:
                 self.set_controller("Y", data["Y"])
@@ -77,14 +85,15 @@ class GIRASoccerReferee(RCJSoccerReferee):
             self.check_goal_flag = True
 
     def start_watchdog(self):
-        if not watchdog_installed: return
+        if not watchdog_installed:
+            return
 
         def on_any_event(_):
             self.reset_controllers_flag = True
 
-        event_handler = PatternMatchingEventHandler(patterns=["*.py"],
-                                                    ignore_patterns=[],
-                                                    ignore_directories=True)
+        event_handler = PatternMatchingEventHandler(
+            patterns=["*.py"], ignore_patterns=[], ignore_directories=True
+        )
         event_handler.on_any_event = on_any_event
         path = CONTROLLERS_DIR
 
@@ -93,7 +102,8 @@ class GIRASoccerReferee(RCJSoccerReferee):
         self.observer.start()
 
     def stop_watchdog(self):
-        if not watchdog_installed: return
+        if not watchdog_installed:
+            return
         self.observer.stop()
 
     def send(self, __key, **args):
@@ -119,8 +129,14 @@ class GIRASoccerReferee(RCJSoccerReferee):
             super().check_robots_in_penalty_area()
 
     def get_current_controller(self, team_name):
-        return next(map(lambda n: self.sv.robot_nodes[n].getField("controller").getSFString(),
-                    filter(lambda n: n[0] == team_name, self.sv.robot_nodes)))
+        return next(
+            map(
+                lambda n: self.sv.robot_nodes[n]
+                .getField("controller")
+                .getSFString(),
+                filter(lambda n: n[0] == team_name, self.sv.robot_nodes),
+            )
+        )
 
     def tick(self):
         self.checkWatchdog()
@@ -128,7 +144,7 @@ class GIRASoccerReferee(RCJSoccerReferee):
         self.sendCurrentState()
 
         return_value = super().tick()
-        
+
         if self.check_timer_flag:
             return return_value
         else:
@@ -136,14 +152,16 @@ class GIRASoccerReferee(RCJSoccerReferee):
 
     def sendCurrentState(self):
         selected = self.sv.getSelected()
-        self.send("update",
-                time=self.sv.getTime(),
-                selected=selected.getDef() if selected is not None else None,
-                ball_translation=self.sv.ball_translation,
-                robot_translation=self.sv.robot_translation,
-                robot_rotation=self.sv.robot_rotation,
-                goal=self.ball_reset_timer > 0,
-                messages=self.pending_messages)
+        self.send(
+            "update",
+            time=self.sv.getTime(),
+            selected=selected.getDef() if selected is not None else None,
+            ball_translation=self.sv.ball_translation,
+            robot_translation=self.sv.robot_translation,
+            robot_rotation=self.sv.robot_rotation,
+            goal=self.ball_reset_timer > 0,
+            messages=self.pending_messages,
+        )
         self.pending_messages = []
 
     def add_event_message_to_queue(self, message: str):
@@ -195,11 +213,17 @@ class GIRASoccerReferee(RCJSoccerReferee):
                 elif key == "restore_state":
                     self.restore_snapshot()
                 elif key == "randomize_ball":
-                    x = random.uniform(FIELD_X_LOWER_LIMIT + 0.1, FIELD_X_UPPER_LIMIT - 0.1)
-                    y = random.uniform(FIELD_Y_LOWER_LIMIT + 0.1, FIELD_Y_UPPER_LIMIT - 0.1)
+                    x = random.uniform(
+                        FIELD_X_LOWER_LIMIT + 0.1, FIELD_X_UPPER_LIMIT - 0.1
+                    )
+                    y = random.uniform(
+                        FIELD_Y_LOWER_LIMIT + 0.1, FIELD_Y_UPPER_LIMIT - 0.1
+                    )
                     self.sv.set_ball_position([x, y, BALL_DEPTH])
                 elif key == "move_object":
-                    self.move_object(args["object"], args["property"], args["value"])
+                    self.move_object(
+                        args["object"], args["property"], args["value"]
+                    )
                 elif key == "move_out":
                     self.move_robots_out_of_field()
 
@@ -213,7 +237,7 @@ class GIRASoccerReferee(RCJSoccerReferee):
         data["BALL"] = {
             "translation": self.sv.ball.getField("translation").getSFVec3f(),
             "rotation": self.sv.ball.getField("rotation").getSFRotation(),
-            "velocity": self.sv.ball.getVelocity()
+            "velocity": self.sv.ball.getVelocity(),
         }
 
         for robot_name in self.sv.robot_nodes:
@@ -225,7 +249,8 @@ class GIRASoccerReferee(RCJSoccerReferee):
         self.saved_snapshot = data
 
     def restore_snapshot(self):
-        if self.saved_snapshot is None: return
+        if self.saved_snapshot is None:
+            return
         for obj_def in self.saved_snapshot:
             obj = self.sv.getFromDef(obj_def)
             data = self.saved_snapshot[obj_def]
@@ -236,16 +261,17 @@ class GIRASoccerReferee(RCJSoccerReferee):
             else:
                 obj.resetPhysics()
 
-
     def move_object(self, object_def, property_name, property_value):
         object = self.sv.getFromDef(object_def)
-        if object is None: return
+        if object is None:
+            return
 
         object.setVelocity([0, 0, 0, 0, 0, 0])
         object.resetPhysics()
 
         if property_name == "a":
-            if object_def == "BALL": return
+            if object_def == "BALL":
+                return
             field = object.getField("rotation")
             field_value = [0, 0, 1, math.radians(property_value)]
             field.setSFRotation(field_value)
@@ -285,7 +311,6 @@ class GIRASoccerReferee(RCJSoccerReferee):
             robot.getField("translation").setSFVec3f(translation)
             self.sv.robot_translation[robot_name] = translation
 
-
     def reset_controllers(self):
         for r in self.sv.robot_nodes:
             self.sv.robot_nodes[r].restartController()
@@ -298,17 +323,20 @@ class GIRASoccerReferee(RCJSoccerReferee):
                 robot.getField("controller").setSFString(controller)
 
     def update_controllers_list(self):
-        controllers=os.listdir(CONTROLLERS_DIR)
+        controllers = os.listdir(CONTROLLERS_DIR)
         controllers.remove(SUPERVISOR_NAME)
-        self.send("update_controllers_list",
-                controllers=controllers,
-                Y=self.get_current_controller("Y"),
-                B=self.get_current_controller("B"))
+        self.send(
+            "update_controllers_list",
+            controllers=controllers,
+            Y=self.get_current_controller("Y"),
+            B=self.get_current_controller("B"),
+        )
 
     def update_flags(self):
-        self.send("update_flags",
-                check_timer=self.check_timer_flag,
-                check_progress=self.check_progress_flag,
-                check_robots_in_penalty_area=self.check_robots_in_penalty_area_flag,
-                check_goal=self.check_goal_flag)
-
+        self.send(
+            "update_flags",
+            check_timer=self.check_timer_flag,
+            check_progress=self.check_progress_flag,
+            check_robots_in_penalty_area=self.check_robots_in_penalty_area_flag,
+            check_goal=self.check_goal_flag,
+        )

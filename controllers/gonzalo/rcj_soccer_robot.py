@@ -7,7 +7,8 @@ from utils import angleBetweenPoints, World
 TIME_STEP = 64
 ROBOT_NAMES = ["B1", "B2", "B3", "Y1", "Y2", "Y3"]
 N_ROBOTS = len(ROBOT_NAMES)
-ball_ant= [0,0]
+ball_ant = [0, 0]
+
 
 class RCJSoccerRobot:
     def __init__(self, robot):
@@ -49,9 +50,9 @@ class RCJSoccerRobot:
 
         self.left_motor.setVelocity(0.0)
         self.right_motor.setVelocity(0.0)
-        
-        self.world=World()
-        self.MAX_VEL=10
+
+        self.world = World()
+        self.MAX_VEL = 10
 
     def parse_supervisor_msg(self, packet: str) -> dict:
         """Parse message received from supervisor
@@ -103,7 +104,7 @@ class RCJSoccerRobot:
             "y": unpacked[2],
             "rotation": unpacked[3],
             "ballX": unpacked[4],
-            "ballY": unpacked[5]
+            "ballY": unpacked[5],
         }
         return data
 
@@ -132,8 +133,15 @@ class RCJSoccerRobot:
              robot_id (int): ID of the robot
         """
         struct_fmt = "i f f f f f"
- 
-        data = [self.player_id, self.get_gps_coordinates()[0], self.get_gps_coordinates()[1], self.get_compass_heading(), self.world.getBall()["x"], self.world.getBall()["y"]]
+
+        data = [
+            self.player_id,
+            self.get_gps_coordinates()[0],
+            self.get_gps_coordinates()[1],
+            self.get_compass_heading(),
+            self.world.getBall()["x"],
+            self.world.getBall()["y"],
+        ]
         packet = struct.pack(struct_fmt, *data)
         self.team_emitter.send(packet)
 
@@ -156,23 +164,23 @@ class RCJSoccerRobot:
             "strength": self.ball_receiver.getSignalStrength(),
         }
 
-        distancia=math.sqrt(1/data["strength"])
-        x=data["direction"][0]
-        y=data["direction"][1]
-        rx=self.get_gps_coordinates()[0]
-        ry=self.get_gps_coordinates()[1]
+        distancia = math.sqrt(1 / data["strength"])
+        x = data["direction"][0]
+        y = data["direction"][1]
+        rx = self.get_gps_coordinates()[0]
+        ry = self.get_gps_coordinates()[1]
         # print(rx,ry,x,y, distancia)
-        da=math.atan2(y,x)
-        da=normalize(da, -math.pi, math.pi)
+        da = math.atan2(y, x)
+        da = normalize(da, -math.pi, math.pi)
         # print(da, self.get_compass_heading())
-        a=self.get_compass_heading()+da
-        a=normalize(a, -math.pi, math.pi)
+        a = self.get_compass_heading() + da
+        a = normalize(a, -math.pi, math.pi)
         # print(r2d(self.get_compass_heading()), r2d(da), r2d(a))
-        
-        dx=math.sin(a)*distancia+rx
-        dy=(-math.cos(a)*distancia+ry)
-        
-        data={"x":dx, "y":dy}
+
+        dx = math.sin(a) * distancia + rx
+        dy = -math.cos(a) * distancia + ry
+
+        data = {"x": dx, "y": dy}
         # print(data, rx, ry)
         self.ball_receiver.nextPacket()
         return data
@@ -204,8 +212,8 @@ class RCJSoccerRobot:
 
         # Add math.pi/2 (90) so that the heading 0 is facing opponent's goal
         rad = math.atan2(compass_values[0], compass_values[1]) + (math.pi / 2)
-        
-        rad=normalize(rad, -math.pi, math.pi)
+
+        rad = normalize(rad, -math.pi, math.pi)
 
         return rad
 
@@ -224,7 +232,7 @@ class RCJSoccerRobot:
 
     def goToBall(self):
         """Go to ball"""
-        #ACAACA Rehacer
+        # ACAACA Rehacer
         # Compute the speed for motors
         direction = self.world.ball["direction"]
 
@@ -243,91 +251,117 @@ class RCJSoccerRobot:
         return True
 
     def lookAtAPoint(self, x, y, thresh=5):
-        deg=r2d(angleBetweenPoints(x,y,self.get_gps_coordinates()[0], self.get_gps_coordinates()[1])+math.pi/2)
-        deg=normalize(deg, -180, 180)
-        rot=r2d(self.get_compass_heading())
-        final=deg-rot
+        deg = r2d(
+            angleBetweenPoints(
+                x,
+                y,
+                self.get_gps_coordinates()[0],
+                self.get_gps_coordinates()[1],
+            )
+            + math.pi / 2
+        )
+        deg = normalize(deg, -180, 180)
+        rot = r2d(self.get_compass_heading())
+        final = deg - rot
         # print("Calculo ori:", final)
-        if final>90:
-            final=final-180
-        if final<-90:
-            final=final+180
-        
-        dir=1
-        vel=abs(final/9)
-        if abs(final)<=thresh:
-            vl=0
-            vr=0
+        if final > 90:
+            final = final - 180
+        if final < -90:
+            final = final + 180
+
+        dir = 1
+        vel = abs(final / 9)
+        if abs(final) <= thresh:
+            vl = 0
+            vr = 0
         else:
-            if final>0:
-                vl=-vel*dir
-                vr=vel*dir
+            if final > 0:
+                vl = -vel * dir
+                vr = vel * dir
             else:
-                vl=vel*dir
-                vr=-vel*dir
-        
+                vl = vel * dir
+                vr = -vel * dir
+
         self.setVelocity(vl, vr)
-        
-        
+
     def goToPoint(self, x, y, thresh):
         """Go to point x y"""
-        deg=r2d(angleBetweenPoints(x,y,self.get_gps_coordinates()[0], self.get_gps_coordinates()[1])+math.pi/2)
-        deg=normalize(deg, -180, 180)
-        rot=r2d(self.get_compass_heading())
-        final=deg-rot
-        
-        dist=math.sqrt((x-self.get_gps_coordinates()[0])**2+(y-self.get_gps_coordinates()[1])**2)
+        deg = r2d(
+            angleBetweenPoints(
+                x,
+                y,
+                self.get_gps_coordinates()[0],
+                self.get_gps_coordinates()[1],
+            )
+            + math.pi / 2
+        )
+        deg = normalize(deg, -180, 180)
+        rot = r2d(self.get_compass_heading())
+        final = deg - rot
 
-        if final>90:
-            final=final-180
-        if final<-90:
-            final=final+180
+        dist = math.sqrt(
+            (x - self.get_gps_coordinates()[0]) ** 2
+            + (y - self.get_gps_coordinates()[1]) ** 2
+        )
 
-        dir=1
-        dif=abs(final/9)*0.5+(1/dist)*0.5
-        if abs(final*dist)<=thresh:
-            vl=self.MAX_VEL
-            vr=self.MAX_VEL
+        if final > 90:
+            final = final - 180
+        if final < -90:
+            final = final + 180
+
+        dir = 1
+        dif = abs(final / 9) * 0.5 + (1 / dist) * 0.5
+        if abs(final * dist) <= thresh:
+            vl = self.MAX_VEL
+            vr = self.MAX_VEL
         else:
-            if final>0:
-                vr=self.MAX_VEL
-                vl=self.MAX_VEL-dif
-                
+            if final > 0:
+                vr = self.MAX_VEL
+                vl = self.MAX_VEL - dif
+
             else:
-                vl=self.MAX_VEL
-                vr=self.MAX_VEL-dif
-        
+                vl = self.MAX_VEL
+                vr = self.MAX_VEL - dif
+
         self.setVelocity(vl, vr)
-    
-    
+
     def stop(self):
         self.left_motor.setVelocity(0)
         self.right_motor.setVelocity(0)
-    
+
     def setVelocity(self, vl, vr):
         self.left_motor.setVelocity(vr)
         self.right_motor.setVelocity(vl)
-        
+
     def refreshWorld(self):
         if self.is_new_data():
-            self.world.wfk= self.get_new_data()  # noqa: F841
+            self.world.wfk = self.get_new_data()  # noqa: F841
 
         while self.is_new_team_data():
             team_data = self.get_new_team_data()
-            self.world.setRobot(team_data["robot_id"], team_data["x"], team_data["y"], team_data["rotation"])
+            self.world.setRobot(
+                team_data["robot_id"],
+                team_data["x"],
+                team_data["y"],
+                team_data["rotation"],
+            )
             # print(team_data)
             if team_data["ballX"] != -100:
                 print(team_data["ball_x"], team_data["ball_y"])
                 self.world.setBall(team_data["ball_x"], team_data["ball_y"])
-        
 
-        self.world.setRobot(self.player_id, self.get_gps_coordinates()[0], self.get_gps_coordinates()[1], self.get_compass_heading())  
-        
+        self.world.setRobot(
+            self.player_id,
+            self.get_gps_coordinates()[0],
+            self.get_gps_coordinates()[1],
+            self.get_compass_heading(),
+        )
+
         if self.is_new_ball_data():
             ball_data = self.get_new_ball_data()
             self.world.setBall(ball_data["x"], ball_data["y"])
         else:
             self.world.setBall(-100, -100)
-            
+
     def run(self):
         raise NotImplementedError

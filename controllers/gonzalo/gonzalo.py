@@ -13,8 +13,8 @@ robot_number = int(name[1])
 #     robot_controller = MyRobot2(robot)
 # else:
 #     robot_controller = MyRobot3(robot)
-print("Robot: ",robot_number)
-if robot_number!=3:
+print("Robot: ", robot_number)
+if robot_number != 3:
 
-    robot_controller=MyRobot2(robot)
+    robot_controller = MyRobot2(robot)
     robot_controller.run()

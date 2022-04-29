@@ -15,26 +15,30 @@ def get_direction(ball_vector: list) -> int:
         return 0
     return -1 if ball_vector[1] < 0 else 1
 
+
 class World:
     def __init__(self):
-        self.wfk=False
-        self.robots=[{"x":0, "y":0, "rot":0}, {"x":0, "y":0, "rot":0}, {"x":0, "y":0, "rot":0}]
-        self.ball={"x":0, "y":0}
-        self.ballAnt={"x":0, "y":0}
+        self.wfk = False
+        self.robots = [
+            {"x": 0, "y": 0, "rot": 0},
+            {"x": 0, "y": 0, "rot": 0},
+            {"x": 0, "y": 0, "rot": 0},
+        ]
+        self.ball = {"x": 0, "y": 0}
+        self.ballAnt = {"x": 0, "y": 0}
 
     def setRobot(self, id, x, y, rot):
-        self.robots[id-1]={"x":x, "y":y, "rot":rot}
-    
+        self.robots[id - 1] = {"x": x, "y": y, "rot": rot}
+
     def getRobot(self, id):
-        return self.robots[id-1]
-    
+        return self.robots[id - 1]
+
     def setBall(self, x, y):
-        self.ball={"x":x, "y":y}
-        
+        self.ball = {"x": x, "y": y}
+
     def getBall(self):
         return self.ball
 
 
 def angleBetweenPoints(x1, y1, x2, y2):
     return math.atan2(y2 - y1, x2 - x1)
-    
