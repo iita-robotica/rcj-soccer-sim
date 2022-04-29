@@ -4,8 +4,6 @@ import os
 import random
 import time
 
-from controller import Supervisor
-
 watchdog_installed = False
 try:
     from watchdog.events import PatternMatchingEventHandler

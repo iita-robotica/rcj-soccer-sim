@@ -15,8 +15,6 @@ from recorder.recorder import (
 )
 from referee.consts import DEFAULT_MATCH_TIME, TIME_STEP
 from referee.event_handlers import DrawMessageHandler, JSONLoggerHandler
-from referee.referee import RCJSoccerReferee
-from referee.supervisor import RCJSoccerSupervisor
 
 
 def get_video_recorder_class(rec_format: str) -> BaseVideoRecordAssistant:
