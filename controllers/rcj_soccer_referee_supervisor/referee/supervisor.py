@@ -45,6 +45,15 @@ class RCJSoccerSupervisor(Supervisor):
 
             self.robot_reset_physics[robot] = 0
 
+    def check_reset_physics_counters(self):
+        # HACK(Richo): Workaround for the following issue
+        # https://github.com/RoboCupJuniorTC/rcj-soccer-sim/issues/130
+        for robot in ROBOT_NAMES:
+            reset_physics_counter = self.robot_reset_physics[robot]
+            if reset_physics_counter > 0:
+                self.robot_nodes[robot].resetPhysics()
+                self.robot_reset_physics[robot] = reset_physics_counter - 1
+
     def update_positions(self):
         """Update the positions of robots and the ball"""
         self.ball_translation = self.ball_translation_field.getSFVec3f()
