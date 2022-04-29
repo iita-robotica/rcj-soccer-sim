@@ -4,6 +4,9 @@ from datetime import datetime
 from math import ceil
 from pathlib import Path, PosixPath
 
+from gira_soccer_referee import GIRASoccerReferee
+from gira_soccer_supervisor import GIRASoccerSupervisor
+
 from recorder.consts import RecordingFormat
 from recorder.recorder import (
     BaseVideoRecordAssistant,
@@ -15,8 +18,6 @@ from referee.event_handlers import DrawMessageHandler, JSONLoggerHandler
 from referee.referee import RCJSoccerReferee
 from referee.supervisor import RCJSoccerSupervisor
 
-from gira_soccer_referee import GIRASoccerReferee
-from gira_soccer_supervisor import GIRASoccerSupervisor
 
 def get_video_recorder_class(rec_format: str) -> BaseVideoRecordAssistant:
     return {

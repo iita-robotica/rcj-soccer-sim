@@ -1,5 +1,6 @@
 from referee.supervisor import RCJSoccerSupervisor
 
+
 # HACK(Richo): For some unknown reason, some of the supervisor labels mess up the
 # supervisor's robot window. This seems to be a webots bug. The weird thing is that 
 # some labels (such as the team names, scores, and time) don't present any issue 

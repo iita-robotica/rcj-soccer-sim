@@ -1,7 +1,8 @@
 import math
 import struct
-from utils import World, angleBetweenPoints
-from angles import r2d, d2r, normalize
+
+from angles import d2r, normalize, r2d
+from utils import angleBetweenPoints, World
 
 TIME_STEP = 64
 ROBOT_NAMES = ["B1", "B2", "B3", "Y1", "Y2", "Y3"]

@@ -1,9 +1,10 @@
-from controller import Robot
-import struct
-import socket
 import json
-import time
 import math
+import socket
+import struct
+import time
+
+from controller import Robot
 
 UDP_IP = "127.0.0.1"
 UDP_PORT = 54321

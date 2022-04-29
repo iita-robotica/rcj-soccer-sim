@@ -1,23 +1,28 @@
-from controller import Supervisor
 import json
-import os
-import time
-import random
 import math
+import os
+import random
+import time
+
+from controller import Supervisor
 
 watchdog_installed = False
 try:
-    from watchdog.observers import Observer
     from watchdog.events import PatternMatchingEventHandler
+    from watchdog.observers import Observer
     watchdog_installed = True
 except:
     print("Watchdog module not installed, automatic controller reload disabled. To enable, run 'pip install watchdog'")
 
+from referee.consts import (
+    BALL_DEPTH,
+    FIELD_X_LOWER_LIMIT,
+    FIELD_X_UPPER_LIMIT,
+    FIELD_Y_LOWER_LIMIT,
+    FIELD_Y_UPPER_LIMIT,
+)
 from referee.referee import RCJSoccerReferee
-from referee.consts import (BALL_DEPTH,
-                            FIELD_X_UPPER_LIMIT, FIELD_X_LOWER_LIMIT,
-                            FIELD_Y_UPPER_LIMIT, FIELD_Y_LOWER_LIMIT)
-from referee.utils import (time_to_string)
+from referee.utils import time_to_string
 
 STATE_FILE = "state.json"
 CONTROLLERS_DIR = ".."

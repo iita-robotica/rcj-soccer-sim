@@ -1,4 +1,6 @@
 import math
+
+
 def get_direction(ball_vector: list) -> int:
     """Get direction to navigate robot to face the ball
 
