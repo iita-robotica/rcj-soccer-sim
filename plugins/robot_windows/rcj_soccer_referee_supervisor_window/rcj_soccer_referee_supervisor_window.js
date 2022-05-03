@@ -164,6 +164,7 @@ let dispatchTable = {
 		snapshot = data;
 	},
 	game_over: function () {
+		$("#goal-panel").hide();
 		$("#game-over-panel").show();
 	},
 };
