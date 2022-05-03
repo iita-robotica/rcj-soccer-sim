@@ -6,3 +6,6 @@ reflog/
 docs/docs/site/
 x11docker/
 Makefile
+
+.lsp/
+.clj-kondo/
