@@ -32,6 +32,14 @@ CONTROLLERS_DIR = ".."
 SUPERVISOR_NAME = os.path.split(os.getcwd())[1]
 
 
+def print_msg(key, args, response_id):
+    kargs = ", ".join([f"{k}: {args[k]}" for k in args])
+    msg = f">>> supervisor.{key}({kargs})"
+    if response_id is not None:
+        msg = msg + f" -> {response_id}"
+    print(msg)
+
+
 class GIRASoccerReferee(RCJSoccerReferee):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -195,12 +203,13 @@ class GIRASoccerReferee(RCJSoccerReferee):
 
         # If there is a message
         if message_text != "":
-            print(message_text)
             try:
                 message = json.loads(message_text)
                 key = message["msg"]
                 args = message["args"]
-                # response_id = message["response_id"]
+                response_id = message["response_id"]
+
+                print_msg(key, args, response_id)
 
                 if key == "setup":
                     self.update_controllers_list()
