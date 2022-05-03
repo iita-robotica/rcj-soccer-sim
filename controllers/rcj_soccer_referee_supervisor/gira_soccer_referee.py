@@ -22,6 +22,7 @@ from referee.consts import (
     FIELD_X_UPPER_LIMIT,
     FIELD_Y_LOWER_LIMIT,
     FIELD_Y_UPPER_LIMIT,
+    TIME_STEP
 )
 from referee.referee import RCJSoccerReferee
 from referee.utils import time_to_string
@@ -149,6 +150,9 @@ class GIRASoccerReferee(RCJSoccerReferee):
         return_value = super().tick()
 
         if self.check_timer_flag:
+            if not return_value:
+                self.send("game_over")
+                self.sv.step(TIME_STEP)
             return return_value
         else:
             return True

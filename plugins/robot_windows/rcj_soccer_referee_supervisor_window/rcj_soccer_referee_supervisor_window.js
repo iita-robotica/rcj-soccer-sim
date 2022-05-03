@@ -162,7 +162,10 @@ let dispatchTable = {
 			data.messages = snapshot.messages.concat(data.messages);
 		}
 		snapshot = data;
-	}
+	},
+	game_over: function () {
+		$("#game-over-panel").show();
+	},
 };
 
 function update () {
