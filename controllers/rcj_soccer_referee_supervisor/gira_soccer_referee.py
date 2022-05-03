@@ -10,9 +10,10 @@ try:
     from watchdog.observers import Observer
 
     watchdog_installed = True
-except:
+except Exception:
     print(
-        "Watchdog module not installed, automatic controller reload disabled. To enable, run 'pip install watchdog'"
+        "Watchdog module not installed, automatic controller"
+        " reload disabled. To enable, run 'pip install watchdog'"
     )
 
 from referee.consts import (
@@ -44,18 +45,22 @@ class GIRASoccerReferee(RCJSoccerReferee):
 
     def saveState(self):
         try:
+            timer_flag = self.check_timer_flag
+            progress_flag = self.check_progress_flag
+            goal_flag = self.check_goal_flag
+            robots_in_area_flag = self.check_robots_in_penalty_area_flag
             data = {
                 "Y": self.get_current_controller("Y"),
                 "B": self.get_current_controller("B"),
                 "saved_snapshot": self.saved_snapshot,
-                "check_timer_flag": self.check_timer_flag,
-                "check_progress_flag": self.check_progress_flag,
-                "check_goal_flag": self.check_goal_flag,
-                "check_robots_in_penalty_area_flag": self.check_robots_in_penalty_area_flag,
+                "check_timer_flag": timer_flag,
+                "check_progress_flag": progress_flag,
+                "check_goal_flag": goal_flag,
+                "check_robots_in_penalty_area_flag": robots_in_area_flag,
             }
             with open(STATE_FILE, "w") as file:
                 json.dump(data, file)
-        except:
+        except Exception:
             print(f"El archivo {STATE_FILE} no se pudo escribir")
 
     def restoreState(self):
@@ -74,7 +79,7 @@ class GIRASoccerReferee(RCJSoccerReferee):
                 self.set_controller("Y", data["Y"])
             if "B" in data:
                 self.set_controller("B", data["B"])
-        except:
+        except Exception:
             print(f"El archivo {STATE_FILE} no se pudo leer")
             self.saved_snapshot = None
             self.check_timer_flag = True
@@ -178,7 +183,7 @@ class GIRASoccerReferee(RCJSoccerReferee):
                 self.reset_controllers_flag = False
                 self.reset_controllers_last_time = time.time()
 
-    def checkIncomingMessages(self):
+    def checkIncomingMessages(self):  # noqa: C901
         # Get the message in from the robot window(if there is one)
         message_text = self.sv.wwiReceiveText()
 
@@ -189,7 +194,7 @@ class GIRASoccerReferee(RCJSoccerReferee):
                 message = json.loads(message_text)
                 key = message["msg"]
                 args = message["args"]
-                response_id = message["response_id"]
+                # response_id = message["response_id"]
 
                 if key == "setup":
                     self.update_controllers_list()
@@ -331,10 +336,14 @@ class GIRASoccerReferee(RCJSoccerReferee):
         )
 
     def update_flags(self):
+        timer_flag = self.check_timer_flag
+        progress_flag = self.check_progress_flag
+        robots_in_area_flag = self.check_robots_in_penalty_area_flag
+        goal_flag = self.check_goal_flag
         self.send(
             "update_flags",
-            check_timer=self.check_timer_flag,
-            check_progress=self.check_progress_flag,
-            check_robots_in_penalty_area=self.check_robots_in_penalty_area_flag,
-            check_goal=self.check_goal_flag,
+            check_timer=timer_flag,
+            check_progress=progress_flag,
+            check_robots_in_penalty_area=robots_in_area_flag,
+            check_goal=goal_flag,
         )
