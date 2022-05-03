@@ -31,7 +31,6 @@ STATE_FILE = "state.json"
 CONTROLLERS_DIR = ".."
 SUPERVISOR_NAME = os.path.split(os.getcwd())[1]
 
-
 class GIRASoccerReferee(RCJSoccerReferee):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -155,6 +154,8 @@ class GIRASoccerReferee(RCJSoccerReferee):
                 self.sv.step(TIME_STEP)
             return return_value
         else:
+            if self.time < TIME_STEP / 1000.0:
+                self.time = TIME_STEP / 1000.0
             return True
 
     def sendCurrentState(self):
