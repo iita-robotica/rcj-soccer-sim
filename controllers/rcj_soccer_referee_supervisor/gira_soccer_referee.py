@@ -22,7 +22,7 @@ from referee.consts import (
     FIELD_X_UPPER_LIMIT,
     FIELD_Y_LOWER_LIMIT,
     FIELD_Y_UPPER_LIMIT,
-    TIME_STEP
+    TIME_STEP,
 )
 from referee.referee import RCJSoccerReferee
 from referee.utils import time_to_string
@@ -30,6 +30,7 @@ from referee.utils import time_to_string
 STATE_FILE = "state.json"
 CONTROLLERS_DIR = ".."
 SUPERVISOR_NAME = os.path.split(os.getcwd())[1]
+
 
 class GIRASoccerReferee(RCJSoccerReferee):
     def __init__(self, *args, **kwargs):
