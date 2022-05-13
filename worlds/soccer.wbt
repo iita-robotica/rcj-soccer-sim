@@ -695,7 +695,7 @@ DEF B1 Robot {
     density -1
     mass 0.2
   }
-  controller "rcj_soccer_team_blue"
+  controller "p_54321"
   synchronization TRUE
 }
 DEF B2 Robot {
@@ -954,7 +954,7 @@ DEF B2 Robot {
   name "B2"
   boundingObject USE BLUE_ROBOT_SHAPE
   physics USE ROBOT_PHYSICS
-  controller "rcj_soccer_team_blue"
+  controller "p_54321"
   synchronization TRUE
 }
 DEF B3 Robot {
@@ -1213,7 +1213,7 @@ DEF B3 Robot {
   name "B3"
   boundingObject USE BLUE_ROBOT_SHAPE
   physics USE ROBOT_PHYSICS
-  controller "rcj_soccer_team_blue"
+  controller "p_54321"
   synchronization TRUE
 }
 DEF Y1 Robot {
@@ -1472,7 +1472,7 @@ DEF Y1 Robot {
   name "Y1"
   boundingObject USE YELLOW_ROBOT_SHAPE
   physics USE ROBOT_PHYSICS
-  controller "rcj_soccer_team_yellow"
+  controller "p_12345"
   synchronization TRUE
 }
 DEF Y2 Robot {
@@ -1731,7 +1731,7 @@ DEF Y2 Robot {
   name "Y2"
   boundingObject USE YELLOW_ROBOT_SHAPE
   physics USE ROBOT_PHYSICS
-  controller "rcj_soccer_team_yellow"
+  controller "p_12345"
   synchronization TRUE
 }
 DEF Y3 Robot {
@@ -1990,7 +1990,7 @@ DEF Y3 Robot {
   name "Y3"
   boundingObject USE YELLOW_ROBOT_SHAPE
   physics USE ROBOT_PHYSICS
-  controller "rcj_soccer_team_yellow"
+  controller "p_12345"
   synchronization TRUE
 }
 Robot {
