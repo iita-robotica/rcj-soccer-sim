@@ -216,6 +216,7 @@ function update () {
 	} else {
 		$("#goal-panel").hide();
 	}
+	$("#start-panel").hide();
 }
 
 function receive (msg, args) {
