@@ -278,6 +278,8 @@ class GIRASoccerReferee(RCJSoccerReferee):
                 obj.setVelocity(data["velocity"])
             else:
                 obj.resetPhysics()
+        for robot_name in self.sv.robot_nodes:
+            self.sv.robot_reset_physics[robot_name] = 2
 
     def move_object(self, object_def, property_name, property_value):
         object = self.sv.getFromDef(object_def)
@@ -286,6 +288,8 @@ class GIRASoccerReferee(RCJSoccerReferee):
 
         object.setVelocity([0, 0, 0, 0, 0, 0])
         object.resetPhysics()
+        if object_def != "BALL":
+            self.sv.robot_reset_physics[object_def] = 2
 
         if property_name == "a":
             if object_def == "BALL":
@@ -316,6 +320,7 @@ class GIRASoccerReferee(RCJSoccerReferee):
             robot = self.sv.getFromDef(robot_name)
             robot.setVelocity([0, 0, 0, 0, 0, 0])
             robot.resetPhysics()
+            self.sv.robot_reset_physics[robot_name] = 2
 
             # Rotation
             rotation = [0, 0, 1, math.radians(90 * (1 if yellow else -1))]
