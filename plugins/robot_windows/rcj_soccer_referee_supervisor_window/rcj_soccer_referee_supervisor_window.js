@@ -46,6 +46,9 @@ $("#move-out-button").on("click", function () {
 
 let snapshot = null;
 let editing = null;
+let last_update_time = +new Date();
+let UPDATE_INTERVAL = 128;
+
 ["ball-x", "ball-y",
 "Y1-x", "Y1-y", "Y1-a",
 "Y2-x", "Y2-y", "Y2-a",
@@ -121,8 +124,8 @@ function resizeMessages() {
 
 
 function startStepping() {
-	setInterval(update, 128);
-  }
+	setInterval(update, UPDATE_INTERVAL);
+}
 
 function delay(ms) {
 	return new Promise(resolve => {
@@ -162,6 +165,7 @@ let dispatchTable = {
 			data.messages = snapshot.messages.concat(data.messages);
 		}
 		snapshot = data;
+		last_update_time = +new Date();
 	},
 	game_over: function () {
 		$("#goal-panel").hide();
@@ -216,7 +220,13 @@ function update () {
 	} else {
 		$("#goal-panel").hide();
 	}
-	$("#start-panel").hide();
+
+	let now = +new Date();
+	if (now - last_update_time > UPDATE_INTERVAL) {
+		$("#simulation-paused-panel").show();
+	} else {
+		$("#simulation-paused-panel").hide();
+	}
 }
 
 function receive (msg, args) {
